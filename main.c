@@ -32,9 +32,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define		ID						0x0100		//ID of supervisory controller - Change this depending on floor
-#define		Go_To_Floor_1			0x05		//Floor 1
-#define		Go_To_Floor_2			0x06		//Floor 2
-#define		Go_To_Floor_3			0x07		//Floor 3
+#define		Go_To_Floor_1			0x05		//Floor 1 ID
+#define		Go_To_Floor_2			0x06		//Floor 2 ID
+#define		Go_To_Floor_3			0x07		//Floor 3 ID
 #define		No_Button_Prssed		0			//Default value of the BUTTON flag - no button pressed
 #define		Blue_Button_Pressed		1			//Value of the BUTTON when blue button is pressed
 
@@ -325,6 +325,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : UserPushBotton_Pin */
+  GPIO_InitStruct.Pin = UserPushBotton_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(UserPushBotton_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -333,6 +339,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
@@ -354,7 +363,7 @@ void HAL_CAN_RxFifoMsgPendingCallback(CAN_HandleTypeDef *hcan){
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 
 	//Set the button flag to indicate which button was pressed
-	if( GPIO_Pin == GPIO_PIN_13){
+	if( GPIO_Pin == GPIO_PIN_15||GPIO_PIN_13){
 		BUTTON = Blue_Button_Pressed;
 	}
 }
